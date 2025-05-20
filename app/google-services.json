@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "46983706244",
+    "project_id": "retry-770de",
+    "storage_bucket": "retry-770de.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:46983706244:android:75f5810ccd1f3af075f4d1",
+        "android_client_info": {
+          "package_name": "com.arise.network"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrKYCDwXF1Njx9ABCCqsmJNaYG3EJ29Ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
