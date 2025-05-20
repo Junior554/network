@@ -1,35 +1,13 @@
 package com.arise.network.screens.services
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import android.widget.Toast
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,10 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.arise.network.navigation.Routes
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +26,7 @@ fun MyServices(navController: NavHostController) {
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    // Load services on screen launch
+    // Load services from Firebase
     LaunchedEffect(uid) {
         if (uid == null) {
             error = "User not logged in"
@@ -88,14 +63,12 @@ fun MyServices(navController: NavHostController) {
             )
         }
     ) { innerPadding ->
-
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-
             when {
                 isLoading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -143,17 +116,60 @@ fun MyServices(navController: NavHostController) {
                                         containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                                     )
                                 ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
+                                    Column(modifier = Modifier.padding(16.dp)) {
                                         Text(
                                             text = service,
                                             style = MaterialTheme.typography.bodyLarge,
                                             color = MaterialTheme.colorScheme.primary
                                         )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            Button(onClick = {
+                                                val newService = "$service (Updated)"
+                                                val index = services.indexOf(service)
+                                                if (index != -1 && uid != null) {
+                                                    val ref = FirebaseDatabase.getInstance()
+                                                        .getReference("users")
+                                                        .child(uid)
+                                                        .child("services")
+
+                                                    ref.child(index.toString()).setValue(newService)
+                                                        .addOnSuccessListener {
+                                                            val updatedServices = services.toMutableList()
+                                                            updatedServices[index] = newService
+                                                            services = updatedServices
+                                                            Toast.makeText(context, "Service updated successfully", Toast.LENGTH_SHORT).show()
+                                                            navController.navigate(Routes.SERVICES)
+                                                        }
+                                                        .addOnFailureListener {
+                                                            Toast.makeText(context, "Failed to update service", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                }
+                                            }) {
+                                                Text("Update Selected Services")
+                                            }
+
+                                            Button(onClick = {
+                                                val index = services.indexOf(service)
+                                                if (index != -1 && uid != null) {
+                                                    val ref = FirebaseDatabase.getInstance()
+                                                        .getReference("users")
+                                                        .child(uid)
+                                                        .child("services")
+
+                                                    ref.child(index.toString()).removeValue()
+                                                        .addOnSuccessListener {
+                                                            services = services.filterNot { it == service }
+                                                            Toast.makeText(context, "Service deleted successfully", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                        .addOnFailureListener {
+                                                            Toast.makeText(context, "Failed to delete service", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                }
+                                            }) {
+                                                Text("Delete Selected Services")
+                                            }
+                                        }
                                     }
                                 }
                             }

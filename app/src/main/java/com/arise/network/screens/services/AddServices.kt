@@ -47,7 +47,10 @@ fun AddServices(navController: NavController) {
         "5G Broadband",
         "DSL",
         "Cable Internet",
-        "Fixed Wireless"
+        "Fixed Wireless",
+        "Wifi Management",
+        "Mbps Upgrade",
+        "Purchase Internet Accessories"
     )
 
     val selectedServices = remember { mutableStateMapOf<String, Boolean>() }

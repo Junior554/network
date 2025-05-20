@@ -49,7 +49,8 @@ composable(Routes.PROFILE) {
             AddServices(navController = navController)
         }
         composable(Routes.MY_SERVICES) {
-            MyServices(navController = navController)
+            MyServices(
+                navController = navController,)
         }
 
 

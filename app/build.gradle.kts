@@ -88,6 +88,9 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore)
 
+
+    implementation ("androidx.compose.material3:material3:1.1.2") // or the latest version
+
     // Testing
 //    testImplementation("junit:junit:4.13.2")
 //    androidTestImplementation("androidx.test.ext:junit:1.1.5")
